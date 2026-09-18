@@ -20,30 +20,39 @@
   </header>
 
   <main id="beranda">
-    <section class="hero">
+    <section class="hero portal-hero">
       <div class="hero-copy">
-        <div class="pill"><span>●</span> 100% gratis & tanpa daftar</div>
-        <h1>Alat kecil untuk<br><em>pekerjaan besar.</em></h1>
-        <p>Kompres, ubah ukuran, konversi gambar, hitung cepat, dan buat caption. Semua tersedia dalam satu tempat yang simpel.</p>
-        <div class="hero-actions"><a class="button primary" href="#alat">Jelajahi alat <span>→</span></a><small>⚡ Diproses langsung di perangkat</small></div>
+        <div class="pill"><span>●</span> Gratis, praktis, tanpa daftar</div>
+        <h1>Alat web gratis<br><em>untuk semua.</em></h1>
+        <p>Temukan alat yang Anda butuhkan dan gunakan langsung dari browser.</p>
+        <label class="tool-search" for="toolSearch"><span>⌕</span><input id="toolSearch" type="search" placeholder="Cari alat, misalnya kompres gambar..." autocomplete="off"><kbd>Ctrl K</kbd></label>
+        <div class="search-suggestions"><span>Pencarian populer:</span><button data-query="gambar">Gambar</button><button data-query="caption">Caption</button><button data-query="kalkulator">Kalkulator</button></div>
       </div>
       <div class="hero-visual" aria-hidden="true">
         <div class="float-card card-purple"><span>🪄</span><b>Caption siap!</b><small>Dalam beberapa detik</small></div>
         <div class="float-card card-white"><span>🖼️</span><div><b>foto-liburan.jpg</b><small>2.8 MB → 428 KB</small></div><i>✓</i></div>
-        <div class="visual-orb"><strong>5</strong><span>alat gratis</span></div>
+        <div class="visual-orb"><strong>5</strong><span>alat siap digunakan</span></div>
         <div class="spark s1">✦</div><div class="spark s2">✦</div>
       </div>
     </section>
 
     <section class="tools-section" id="alat">
-      <div class="section-heading"><div><span class="kicker">PILIH ALATMU</span><h2>Selesaikan lebih cepat</h2></div><p>Tanpa instal aplikasi. Pilih alat, masukkan bahan, lalu unduh hasilnya.</p></div>
-      <div class="tool-grid">
-        <button class="tool-card peach" data-open="compressor"><span class="tool-icon">🗜️</span><b>Kompres Gambar</b><small>Perkecil ukuran file tanpa ribet</small><i>→</i></button>
-        <button class="tool-card lilac" data-open="resizer"><span class="tool-icon">↔️</span><b>Resize Foto</b><small>Atur lebar dan tinggi dengan mudah</small><i>→</i></button>
-        <button class="tool-card mint" data-open="converter"><span class="tool-icon">🔄</span><b>Konverter Gambar</b><small>JPG, PNG, dan WEBP</small><i>→</i></button>
-        <button class="tool-card yellow" data-open="calculator"><span class="tool-icon">🧮</span><b>Kalkulator</b><small>Hitung cepat kebutuhan sehari-hari</small><i>→</i></button>
-        <button class="tool-card blue" data-open="caption"><span class="tool-icon">✨</span><b>Generator Caption</b><small>Ide caption untuk media sosial</small><i>→</i></button>
+      <div class="category-bar" role="list" aria-label="Kategori alat">
+        <button class="category active" data-filter="all">▦ Semua</button>
+        <button class="category" data-filter="gambar">🖼️ Gambar</button>
+        <button class="category" data-filter="teks">📝 Teks</button>
+        <button class="category" data-filter="hitung">🧮 Perhitungan</button>
+        <button class="category" data-filter="konversi">🔄 Konversi</button>
       </div>
+      <div class="section-heading"><div><span class="kicker">🔥 ALAT UNGGULAN</span><h2>Alat populer</h2></div><p>Alat praktis yang paling sering dibutuhkan untuk pekerjaan sehari-hari.</p></div>
+      <div class="tool-grid">
+        <button class="tool-card peach" data-open="compressor" data-category="gambar" data-name="kompres gambar foto perkecil ukuran file"><span class="rank">Populer</span><span class="tool-icon">🗜️</span><b>Kompres Gambar</b><small>Perkecil ukuran JPG, PNG, atau WEBP tanpa ribet</small><i>→</i></button>
+        <button class="tool-card lilac" data-open="resizer" data-category="gambar" data-name="resize foto gambar ubah ukuran dimensi"><span class="rank">Populer</span><span class="tool-icon">↔️</span><b>Resize Foto</b><small>Ubah lebar dan tinggi sambil menjaga proporsi</small><i>→</i></button>
+        <button class="tool-card mint" data-open="converter" data-category="gambar konversi" data-name="konverter gambar jpg png webp format"><span class="rank">Baru</span><span class="tool-icon">🔄</span><b>Konverter Gambar</b><small>Konversi JPG, PNG, dan WEBP langsung di browser</small><i>→</i></button>
+        <button class="tool-card yellow" data-open="calculator" data-category="hitung" data-name="kalkulator hitung perhitungan angka"><span class="rank">Populer</span><span class="tool-icon">🧮</span><b>Kalkulator</b><small>Hitung operasi dasar dengan cepat dan mudah</small><i>→</i></button>
+        <button class="tool-card blue" data-open="caption" data-category="teks" data-name="generator caption teks instagram tiktok facebook whatsapp"><span class="rank">Baru</span><span class="tool-icon">✨</span><b>Generator Caption</b><small>Buat ide caption untuk berbagai media sosial</small><i>→</i></button>
+      </div>
+      <p class="no-results hidden" id="noResults">Tidak ada alat yang cocok. Coba kata pencarian lain.</p>
 
       <div class="workspace hidden" id="workspace">
         <button class="workspace-close" id="closeWorkspace" aria-label="Tutup">×</button>

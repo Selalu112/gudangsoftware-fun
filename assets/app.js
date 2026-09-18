@@ -2,6 +2,17 @@ const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove('show'),2200)};
 const state={};
 
+const toolSearch=$('#toolSearch'),toolCards=[...$$('.tool-card')];
+function filterTools(query='',category='all'){
+  const q=query.trim().toLowerCase();let visible=0;
+  toolCards.forEach(card=>{const matchText=!q||(card.dataset.name||card.textContent).toLowerCase().includes(q);const matchCategory=category==='all'||(card.dataset.category||'').split(' ').includes(category);const show=matchText&&matchCategory;card.classList.toggle('filtered-out',!show);if(show)visible++});
+  $('#noResults').classList.toggle('hidden',visible>0);
+}
+toolSearch.addEventListener('input',()=>{filterTools(toolSearch.value,$('.category.active')?.dataset.filter||'all');if(location.hash!=='#alat')location.hash='alat'});
+$$('.category').forEach(button=>button.onclick=()=>{$$('.category').forEach(x=>x.classList.remove('active'));button.classList.add('active');filterTools(toolSearch.value,button.dataset.filter)});
+$$('[data-query]').forEach(button=>button.onclick=()=>{toolSearch.value=button.dataset.query;filterTools(toolSearch.value,'all');$$('.category').forEach(x=>x.classList.toggle('active',x.dataset.filter==='all'));location.hash='alat'});
+document.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();toolSearch.focus()}});
+
 $$('[data-open]').forEach(card=>card.onclick=()=>{
   $$('.tool-panel').forEach(p=>p.classList.remove('active'));
   $('#'+card.dataset.open).classList.add('active');

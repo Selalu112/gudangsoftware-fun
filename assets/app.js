@@ -1,15 +1,57 @@
-const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);let sourceFile,sourceImage,ratio=1;
-const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)};
-$('.nav-toggle').onclick=()=>{const n=$('.site-header nav');n.classList.toggle('open');$('.nav-toggle').setAttribute('aria-expanded',n.classList.contains('open'))};
-$$('.tab').forEach(b=>b.onclick=()=>{$$('.tab,.tool-panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')});
-const loadImage=file=>new Promise((ok,no)=>{const i=new Image;i.onload=()=>ok(i);i.onerror=no;i.src=URL.createObjectURL(file)});
-async function openEditor(file){if(!file||!/^image\/(jpeg|png|webp)$/.test(file.type))return toast('Pilih file JPG, PNG, atau WEBP');sourceFile=file;sourceImage=await loadImage(file);ratio=sourceImage.width/sourceImage.height;$('#widthInput').value=sourceImage.width;$('#heightInput').value=sourceImage.height;$('#preview').src=sourceImage.src;$('#originalInfo').textContent=`${sourceImage.width} × ${sourceImage.height} px · ${(sourceImage.width*sourceImage.height/1e6).toFixed(2)} MP · ${formatBytes(file.size)}`;$('#dropzone').classList.add('hidden');$('#editor').classList.remove('hidden')}
-$('#pickImage').onclick=()=>$('#imageInput').click();$('#imageInput').onchange=e=>openEditor(e.target.files[0]);
-const dz=$('#dropzone');['dragenter','dragover'].forEach(x=>dz.addEventListener(x,e=>{e.preventDefault();dz.classList.add('drag')}));['dragleave','drop'].forEach(x=>dz.addEventListener(x,e=>{e.preventDefault();dz.classList.remove('drag')}));dz.ondrop=e=>openEditor(e.dataTransfer.files[0]);
-$('#widthInput').oninput=e=>{if($('#lockRatio').checked)$('#heightInput').value=Math.max(1,Math.round(e.target.value/ratio))};$('#heightInput').oninput=e=>{if($('#lockRatio').checked)$('#widthInput').value=Math.max(1,Math.round(e.target.value*ratio))};$('#qualityInput').oninput=e=>$('#qualityValue').textContent=e.target.value+'%';
-$('#downloadImage').onclick=()=>{if(!sourceImage)return;const w=+$ ('#widthInput').value,h=+$ ('#heightInput').value;if(!w||!h||w*h>120000000)return toast('Ukuran gambar tidak valid atau terlalu besar');const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(sourceImage,0,0,w,h);const type=$('#formatInput').value,q=+$('#qualityInput').value/100;c.toBlob(blob=>{const a=document.createElement('a'),ext=type.split('/')[1].replace('jpeg','jpg');a.href=URL.createObjectURL(blob);a.download=(sourceFile.name.replace(/\.[^.]+$/,'')||'foto')+`-${w}x${h}.${ext}`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast('Foto selesai diproses')},type,q)};
-$('#pickInspect').onclick=()=>$('#inspectInput').click();$('#inspectInput').onchange=async e=>{const f=e.target.files[0];if(!f)return;const i=await loadImage(f),mp=i.width*i.height/1e6,ok=mp>=4;$('#inspectResult').innerHTML=`<div class="metric"><b>${i.width} × ${i.height}</b><span>Dimensi piksel</span></div><div class="metric"><b>${mp.toFixed(2)} MP</b><span>Megapiksel</span></div><div class="metric"><b>${(f.type.split('/')[1]||'—').toUpperCase()}</b><span>Format</span></div><div class="metric"><b>${formatBytes(f.size)}</b><span>Ukuran file</span></div><div class="verdict ${ok?'':'bad'}">${ok?'✓ Resolusi memenuhi batas minimum umum 4 MP. Tetap periksa ketajaman, noise, dan hak cipta.':'✕ Resolusi di bawah 4 MP. Hindari memperbesar secara paksa karena tidak menambah detail asli.'}</div>`;$('#inspectResult').classList.remove('hidden')};
-const translate={kopi:'coffee',hitam:'black',putih:'white',foto:'photo',orang:'people',pria:'man',wanita:'woman',anak:'child',jalan:'street',kota:'city',desa:'village',makanan:'food',minuman:'drink',tradisional:'traditional',pagi:'morning',malam:'night',alam:'nature',pantai:'beach',gunung:'mountain',indonesia:'Indonesia',santai:'relaxation'};
-$('#generateKeywords').onclick=()=>{const raw=[$('#subject').value,$('#setting').value,$('#concept').value].join(',').toLowerCase().split(/[,;]+/).map(x=>x.trim()).filter(Boolean);if(!raw.length)return toast('Isi minimal objek utama');let words=[];raw.forEach(p=>{words.push(p);p.split(/\s+/).forEach(w=>words.push($('#keywordLang').value==='en'?(translate[w]||w):w))});if($('#keywordLang').value==='en')words.push('Indonesia','creative','visual','lifestyle','close up','copy space');words=[...new Set(words.filter(x=>x.length>1))].slice(0,50);$('#keywordChips').innerHTML=words.map(x=>`<span class="chip">${escapeHtml(x)}</span>`).join('');$('#keywordHint').textContent=`${words.length} keyword. Periksa kembali relevansinya sebelum dipakai.`;$('#copyKeywords').classList.remove('hidden');$('#copyKeywords').dataset.value=words.join(', ')};
-$('#copyKeywords').onclick=async e=>{await navigator.clipboard.writeText(e.target.dataset.value);toast('Keyword disalin')};
-function formatBytes(n){if(n<1024)return n+' B';if(n<1048576)return(n/1024).toFixed(1)+' KB';return(n/1048576).toFixed(2)+' MB'}function escapeHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}$('#year').textContent=new Date().getFullYear();
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove('show'),2200)};
+const state={};
+
+$$('[data-open]').forEach(card=>card.onclick=()=>{
+  $$('.tool-panel').forEach(p=>p.classList.remove('active'));
+  $('#'+card.dataset.open).classList.add('active');
+  $('#workspace').classList.remove('hidden');
+  setTimeout(()=>$('#workspace').scrollIntoView({behavior:'smooth',block:'start'}),40);
+});
+$('#closeWorkspace').onclick=()=>$('#workspace').classList.add('hidden');
+$$('.choose-file').forEach(b=>b.onclick=()=>$('#'+b.dataset.pick).click());
+
+function formatBytes(n){if(n<1024)return n+' B';if(n<1048576)return(n/1024).toFixed(1)+' KB';return(n/1048576).toFixed(2)+' MB'}
+function loadImage(file){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=URL.createObjectURL(file)})}
+async function prepareImage(input){
+  const file=input.files[0];
+  if(!file||!/^image\/(jpeg|png|webp)$/.test(file.type))return toast('Pilih gambar JPG, PNG, atau WEBP');
+  const mode=input.id.replace('Input',''),img=await loadImage(file),editor=$('#'+mode+'Editor');
+  state[mode]={file,img,ratio:img.width/img.height};
+  editor.querySelector('.image-preview').src=img.src;
+  editor.querySelector('.file-info').textContent=`${file.name} · ${img.width} × ${img.height} px · ${formatBytes(file.size)}`;
+  editor.classList.remove('hidden');
+  if(mode==='resize'){$('#resizeWidth').value=img.width;$('#resizeHeight').value=img.height}
+}
+$$('.image-source').forEach(input=>input.onchange=()=>prepareImage(input));
+$('#compressQuality').oninput=e=>$('#compressQualityText').textContent=e.target.value+'%';
+$('#resizeWidth').oninput=e=>{const s=state.resize;if(s&&$('#resizeLock').checked)$('#resizeHeight').value=Math.max(1,Math.round(+e.target.value/s.ratio))};
+$('#resizeHeight').oninput=e=>{const s=state.resize;if(s&&$('#resizeLock').checked)$('#resizeWidth').value=Math.max(1,Math.round(+e.target.value*s.ratio))};
+
+function exportImage(mode){
+  const s=state[mode];if(!s)return toast('Pilih gambar terlebih dahulu');
+  let w=s.img.width,h=s.img.height,type=s.file.type,quality=.9,suffix=mode;
+  if(mode==='compress'){quality=+$('#compressQuality').value/100;type=s.file.type==='image/png'?'image/webp':s.file.type}
+  if(mode==='resize'){w=+$('#resizeWidth').value;h=+$('#resizeHeight').value;quality=.92}
+  if(mode==='convert'){type=$('#convertFormat').value;quality=.92;suffix=type.split('/')[1]}
+  if(!w||!h||w*h>120000000)return toast('Dimensi gambar tidak valid atau terlalu besar');
+  const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+  const ctx=canvas.getContext('2d');if(type==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h)}ctx.drawImage(s.img,0,0,w,h);
+  canvas.toBlob(blob=>{if(!blob)return toast('Format ini tidak didukung browser');const a=document.createElement('a'),ext=type.split('/')[1].replace('jpeg','jpg');a.href=URL.createObjectURL(blob);a.download=(s.file.name.replace(/\.[^.]+$/,'')||'gambar')+`-${suffix}.${ext}`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2500);toast(`Selesai · ${formatBytes(blob.size)}`)},type,quality);
+}
+$$('.process-image').forEach(b=>b.onclick=()=>exportImage(b.dataset.mode));
+
+let expression='';
+function renderCalc(v){$('#calcDisplay').value=v||'0'}
+$$('[data-val]').forEach(b=>b.onclick=()=>{const v=b.dataset.val;if(expression==='Error')expression='';if(/[+\-*/%]$/.test(expression)&&/[+\-*/%]/.test(v))expression=expression.slice(0,-1);expression+=v;renderCalc(expression.replace(/\*/g,'×').replace(/\//g,'÷'))});
+$$('[data-calc]').forEach(b=>b.onclick=()=>{if(b.dataset.calc==='clear')expression='';if(b.dataset.calc==='back')expression=expression.slice(0,-1);if(b.dataset.calc==='equals'){try{if(!/^[0-9+\-*/%.() ]+$/.test(expression))throw 0;const result=Function('"use strict";return ('+expression+')')();expression=Number.isFinite(result)?String(Math.round(result*1e10)/1e10):'Error'}catch{expression='Error'}}renderCalc(expression)});
+
+const captionTemplates={
+  santai:[t=>`Lagi menikmati ${t}. Hal sederhana yang bikin hari terasa lebih menyenangkan ✨`,t=>`${t} dulu, urusan lain menyusul 😌 Siapa yang sama?`,t=>`Hari ini ditemani ${t}. Kadang bahagia memang sesederhana itu 💜`],
+  promosi:[t=>`Saatnya coba ${t}! Kualitas pilihan, praktis, dan siap menemani harimu. Yuk, pesan sekarang 🛍️`,t=>`Sedang cari ${t}? Ini waktunya mendapatkan pilihan terbaik. Jangan sampai kehabisan!`,t=>`${t} yang kamu tunggu sudah hadir ✨ Klik, pesan, dan nikmati hari ini.`],
+  inspiratif:[t=>`${t} mengingatkan kita: langkah kecil hari ini bisa menjadi perubahan besar esok hari.`,t=>`Mulai saja dari ${t}. Tidak harus sempurna, yang penting terus bertumbuh 🌱`,t=>`Setiap cerita hebat punya awal. Biarkan ${t} menjadi bagian dari perjalananmu.`],
+  lucu:[t=>`Katanya bahagia itu mahal. Untung masih ada ${t} 😂`,t=>`Rencana hari ini: fokus. Kenyataannya: kepikiran ${t} terus 🤭`,t=>`${t}: 1, niat produktif: 0. Besok kita coba lagi! 😄`]
+};
+$('#makeCaption').onclick=()=>{const topic=$('#captionTopic').value.trim(),tone=$('#captionTone').value,platform=$('#captionPlatform').value;if(!topic)return toast('Isi topik atau produk dulu');const tags=topic.toLowerCase().replace(/[^a-z0-9\s]/gi,'').split(/\s+/).filter(Boolean).slice(0,3).map(x=>'#'+x).join(' ');$('#captionResults').innerHTML=captionTemplates[tone].map((fn,i)=>`<div class="caption-item"><p>${escapeHtml(fn(topic))}<br><small>${tags} #${platform.toLowerCase()}</small></p><button class="copy-caption" data-copy="${i}">Salin</button></div>`).join('');$$('.copy-caption').forEach((b,i)=>b.onclick=async()=>{await navigator.clipboard.writeText($('#captionResults').children[i].innerText.replace('Salin','').trim());toast('Caption disalin')})};
+function escapeHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+$('#year').textContent=new Date().getFullYear();

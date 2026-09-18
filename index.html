@@ -3,99 +3,80 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>GudangSoftware — Alat Foto Gratis untuk Kreator</title>
-  <meta name="description" content="Kompres dan resize foto, cek spesifikasi gambar, serta buat keyword stok secara gratis. Semua diproses lokal di perangkat Anda.">
-  <meta name="theme-color" content="#07111f">
+  <title>GudangSoftware — Alat Gratis Sehari-hari</title>
+  <meta name="description" content="Kompres gambar, resize foto, konverter gambar, kalkulator, dan generator caption gratis. Cepat dan langsung di browser.">
+  <meta name="theme-color" content="#725cff">
   <link rel="canonical" href="https://gudangsoftware.fun/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="site.webmanifest">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+  <div class="ambient a1"></div><div class="ambient a2"></div>
   <header class="site-header">
-    <a class="brand" href="#beranda" aria-label="GudangSoftware beranda"><span>G</span> GudangSoftware</a>
-    <button class="nav-toggle" aria-label="Buka menu" aria-expanded="false">☰</button>
-    <nav><a href="#alat">Alat gratis</a><a href="#panduan">Panduan</a><a href="#tentang">Tentang</a></nav>
+    <a class="brand" href="#beranda"><span>G</span><b>GudangSoftware</b></a>
+    <nav><a href="#alat">Semua alat</a><a href="#cara">Cara pakai</a><a href="#tentang">Tentang</a></nav>
+    <a class="header-cta" href="#alat">Coba gratis</a>
   </header>
 
   <main id="beranda">
     <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">GRATIS • TANPA UNGGAH • RAMAH PRIVASI</p>
-        <h1>Siapkan foto lebih cepat, langsung dari browser.</h1>
-        <p>Kompres, ubah ukuran, periksa resolusi, dan susun keyword untuk foto stok. File tetap berada di perangkat Anda.</p>
-        <a class="button primary" href="#alat">Pilih alat</a>
+        <div class="pill"><span>●</span> 100% gratis & tanpa daftar</div>
+        <h1>Alat kecil untuk<br><em>pekerjaan besar.</em></h1>
+        <p>Kompres, ubah ukuran, konversi gambar, hitung cepat, dan buat caption. Semua tersedia dalam satu tempat yang simpel.</p>
+        <div class="hero-actions"><a class="button primary" href="#alat">Jelajahi alat <span>→</span></a><small>⚡ Diproses langsung di perangkat</small></div>
       </div>
-      <div class="hero-card" aria-hidden="true">
-        <div class="orbit"><b>4 MP</b><span>Siap diperiksa</span></div>
-        <div class="mini-card">JPG · PNG · WEBP</div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="float-card card-purple"><span>🪄</span><b>Caption siap!</b><small>Dalam beberapa detik</small></div>
+        <div class="float-card card-white"><span>🖼️</span><div><b>foto-liburan.jpg</b><small>2.8 MB → 428 KB</small></div><i>✓</i></div>
+        <div class="visual-orb"><strong>5</strong><span>alat gratis</span></div>
+        <div class="spark s1">✦</div><div class="spark s2">✦</div>
       </div>
     </section>
 
-    <section class="section" id="alat">
-      <p class="eyebrow">ALAT PILIHAN</p>
-      <h2>Satu tempat untuk pekerjaan kecil yang merepotkan</h2>
-      <div class="tool-tabs" role="tablist">
-        <button class="tab active" data-tab="compressor">Kompres & resize</button>
-        <button class="tab" data-tab="inspector">Cek foto</button>
-        <button class="tab" data-tab="keywords">Keyword stok</button>
+    <section class="tools-section" id="alat">
+      <div class="section-heading"><div><span class="kicker">PILIH ALATMU</span><h2>Selesaikan lebih cepat</h2></div><p>Tanpa instal aplikasi. Pilih alat, masukkan bahan, lalu unduh hasilnya.</p></div>
+      <div class="tool-grid">
+        <button class="tool-card peach" data-open="compressor"><span class="tool-icon">🗜️</span><b>Kompres Gambar</b><small>Perkecil ukuran file tanpa ribet</small><i>→</i></button>
+        <button class="tool-card lilac" data-open="resizer"><span class="tool-icon">↔️</span><b>Resize Foto</b><small>Atur lebar dan tinggi dengan mudah</small><i>→</i></button>
+        <button class="tool-card mint" data-open="converter"><span class="tool-icon">🔄</span><b>Konverter Gambar</b><small>JPG, PNG, dan WEBP</small><i>→</i></button>
+        <button class="tool-card yellow" data-open="calculator"><span class="tool-icon">🧮</span><b>Kalkulator</b><small>Hitung cepat kebutuhan sehari-hari</small><i>→</i></button>
+        <button class="tool-card blue" data-open="caption"><span class="tool-icon">✨</span><b>Generator Caption</b><small>Ide caption untuk media sosial</small><i>→</i></button>
       </div>
 
-      <article class="tool-panel active" id="compressor">
-        <div class="dropzone" id="dropzone">
-          <input id="imageInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-          <div class="drop-icon">↥</div><h3>Pilih atau jatuhkan foto</h3>
-          <p>JPG, PNG, atau WEBP. Diproses lokal, tidak dikirim ke server.</p>
-          <button class="button secondary" id="pickImage">Pilih foto</button>
-        </div>
-        <div class="editor hidden" id="editor">
-          <div class="preview-wrap"><img id="preview" alt="Pratinjau foto"><p id="originalInfo"></p></div>
-          <div class="controls">
-            <label>Lebar (px)<input id="widthInput" type="number" min="1"></label>
-            <label>Tinggi (px)<input id="heightInput" type="number" min="1"></label>
-            <label class="check"><input id="lockRatio" type="checkbox" checked> Pertahankan rasio</label>
-            <label>Format<select id="formatInput"><option value="image/jpeg">JPG</option><option value="image/webp">WEBP</option><option value="image/png">PNG</option></select></label>
-            <label>Kualitas <strong id="qualityValue">85%</strong><input id="qualityInput" type="range" min="30" max="100" value="85"></label>
-            <button class="button primary" id="downloadImage">Proses & unduh</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="tool-panel" id="inspector">
-        <div class="dropzone compact">
-          <input id="inspectInput" type="file" accept="image/*" hidden>
-          <h3>Periksa spesifikasi foto</h3><p>Ketahui dimensi, megapiksel, format, ukuran file, dan kelayakan minimum 4 MP.</p>
-          <button class="button secondary" id="pickInspect">Pilih foto</button>
-        </div>
-        <div class="result hidden" id="inspectResult"></div>
-      </article>
-
-      <article class="tool-panel" id="keywords">
-        <div class="keyword-grid">
-          <div>
-            <label>Objek utama<input id="subject" placeholder="contoh: kopi hitam"></label>
-            <label>Lokasi/suasana<input id="setting" placeholder="contoh: warung kopi Indonesia"></label>
-            <label>Gaya/konsep<input id="concept" placeholder="contoh: tradisional, santai, pagi"></label>
-            <label>Bahasa<select id="keywordLang"><option value="en">English (disarankan stok)</option><option value="id">Indonesia</option></select></label>
-            <button class="button primary" id="generateKeywords">Buat keyword</button>
-          </div>
-          <div class="keyword-output"><h3>Hasil keyword</h3><p id="keywordHint">Isi keterangan di sebelah kiri.</p><div id="keywordChips"></div><button class="button secondary hidden" id="copyKeywords">Salin semua</button></div>
-        </div>
-      </article>
+      <div class="workspace hidden" id="workspace">
+        <button class="workspace-close" id="closeWorkspace" aria-label="Tutup">×</button>
+        <article class="tool-panel" id="compressor">
+          <div class="panel-title"><span>🗜️</span><div><h3>Kompres Gambar</h3><p>Atur kualitas dan perkecil ukuran file.</p></div></div>
+          <div class="dropzone"><input class="image-source" id="compressInput" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="choose-file" data-pick="compressInput">＋ Pilih gambar</button><p>JPG, PNG, atau WEBP · maksimal sesuai kemampuan perangkat</p></div>
+          <div class="image-editor hidden" id="compressEditor"><img class="image-preview" alt="Pratinjau"><div class="form-stack"><p class="file-info"></p><label>Kualitas hasil <b id="compressQualityText">75%</b><input id="compressQuality" type="range" min="20" max="95" value="75"></label><button class="button primary process-image" data-mode="compress">Kompres & unduh</button></div></div>
+        </article>
+        <article class="tool-panel" id="resizer">
+          <div class="panel-title"><span>↔️</span><div><h3>Resize Foto</h3><p>Ubah dimensi sambil menjaga proporsi.</p></div></div>
+          <div class="dropzone"><input class="image-source" id="resizeInput" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="choose-file" data-pick="resizeInput">＋ Pilih gambar</button><p>File diproses lokal dan tidak diunggah</p></div>
+          <div class="image-editor hidden" id="resizeEditor"><img class="image-preview" alt="Pratinjau"><div class="form-stack"><p class="file-info"></p><div class="two-inputs"><label>Lebar (px)<input id="resizeWidth" type="number" min="1"></label><label>Tinggi (px)<input id="resizeHeight" type="number" min="1"></label></div><label class="inline-check"><input id="resizeLock" type="checkbox" checked> Pertahankan rasio</label><button class="button primary process-image" data-mode="resize">Resize & unduh</button></div></div>
+        </article>
+        <article class="tool-panel" id="converter">
+          <div class="panel-title"><span>🔄</span><div><h3>Konverter Gambar</h3><p>Ubah format gambar dalam sekali klik.</p></div></div>
+          <div class="dropzone"><input class="image-source" id="convertInput" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="choose-file" data-pick="convertInput">＋ Pilih gambar</button><p>Mendukung JPG, PNG, dan WEBP</p></div>
+          <div class="image-editor hidden" id="convertEditor"><img class="image-preview" alt="Pratinjau"><div class="form-stack"><p class="file-info"></p><label>Ubah menjadi<select id="convertFormat"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WEBP</option></select></label><button class="button primary process-image" data-mode="convert">Konversi & unduh</button></div></div>
+        </article>
+        <article class="tool-panel" id="calculator">
+          <div class="panel-title"><span>🧮</span><div><h3>Kalkulator</h3><p>Hitung operasi dasar dengan cepat.</p></div></div>
+          <div class="calculator"><div class="calc-screen"><small>Hasil</small><input id="calcDisplay" value="0" readonly></div><div class="calc-keys"><button data-calc="clear">AC</button><button data-calc="back">⌫</button><button data-val="%">%</button><button data-val="/" class="op">÷</button><button data-val="7">7</button><button data-val="8">8</button><button data-val="9">9</button><button data-val="*" class="op">×</button><button data-val="4">4</button><button data-val="5">5</button><button data-val="6">6</button><button data-val="-" class="op">−</button><button data-val="1">1</button><button data-val="2">2</button><button data-val="3">3</button><button data-val="+" class="op">+</button><button data-val="0" class="wide">0</button><button data-val=".">.</button><button data-calc="equals" class="equals">=</button></div></div>
+        </article>
+        <article class="tool-panel" id="caption">
+          <div class="panel-title"><span>✨</span><div><h3>Generator Caption</h3><p>Buat ide caption Indonesia dalam sekejap.</p></div></div>
+          <div class="caption-maker"><div class="form-stack"><label>Topik atau produk<input id="captionTopic" placeholder="Contoh: kopi susu buatan sendiri"></label><div class="two-inputs"><label>Gaya<select id="captionTone"><option value="santai">Santai</option><option value="promosi">Promosi</option><option value="inspiratif">Inspiratif</option><option value="lucu">Lucu</option></select></label><label>Platform<select id="captionPlatform"><option>Instagram</option><option>TikTok</option><option>Facebook</option><option>WhatsApp</option></select></label></div><button class="button primary" id="makeCaption">Buat 3 caption</button></div><div class="caption-results" id="captionResults"><p class="empty-state">Hasil caption akan muncul di sini ✨</p></div></div>
+        </article>
+      </div>
     </section>
 
-    <section class="section guide" id="panduan">
-      <div><p class="eyebrow">PANDUAN SINGKAT</p><h2>Foto stok yang bersih lebih mudah digunakan pembeli</h2></div>
-      <ol><li><b>Periksa ketajaman.</b><span>Lihat foto pada ukuran 100% dan hindari noise berlebihan.</span></li><li><b>Jaga ukuran.</b><span>Gunakan resolusi asli; jangan memperbesar foto kecil secara paksa.</span></li><li><b>Tulis metadata jujur.</b><span>Deskripsi dan keyword harus sesuai dengan yang terlihat.</span></li></ol>
-    </section>
-
-    <section class="section about" id="tentang">
-      <p class="eyebrow">TENTANG</p><h2>Alat sederhana, tanpa mengambil file Anda.</h2>
-      <p>GudangSoftware menyediakan utilitas browser gratis untuk kreator, pelajar, dan pemilik usaha kecil. Pemrosesan gambar dilakukan di perangkat Anda menggunakan teknologi browser.</p>
-    </section>
+    <section class="how" id="cara"><span class="kicker">GAMPANG BANGET</span><h2>Tiga langkah, langsung beres</h2><div class="steps"><div><b>01</b><span>Pilih alat</span><p>Tentukan pekerjaan yang ingin diselesaikan.</p></div><div><b>02</b><span>Masukkan bahan</span><p>Semua diproses aman di browser Anda.</p></div><div><b>03</b><span>Ambil hasil</span><p>Salin atau unduh hasilnya seketika.</p></div></div></section>
+    <section class="privacy-banner" id="tentang"><div>🔒</div><div><span class="kicker">PRIVASI DIUTAMAKAN</span><h2>File Anda tetap milik Anda.</h2><p>Pemrosesan gambar berjalan langsung di perangkat. Kami tidak mengunggah atau menyimpan file Anda.</p></div></section>
   </main>
-
-  <footer><a class="brand" href="#beranda"><span>G</span> GudangSoftware</a><p>© <span id="year"></span> GudangSoftware.</p><div><a href="privasi.html">Privasi</a><a href="ketentuan.html">Ketentuan</a></div></footer>
+  <footer><a class="brand" href="#beranda"><span>G</span><b>GudangSoftware</b></a><p>© <span id="year"></span> GudangSoftware</p><div><a href="privasi.html">Privasi</a><a href="ketentuan.html">Ketentuan</a></div></footer>
   <div class="toast" id="toast" role="status"></div>
   <script src="assets/app.js" defer></script>
 </body>

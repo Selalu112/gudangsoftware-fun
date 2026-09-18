@@ -17,6 +17,7 @@ $$('[data-open]').forEach(card=>card.onclick=()=>{
   $$('.tool-panel').forEach(p=>p.classList.remove('active'));
   $('#'+card.dataset.open).classList.add('active');
   if(card.dataset.quick)renderQuickTool(card.dataset.quick);
+  if(card.dataset.convert)renderFileTool(card.dataset.convert);
   $('#workspace').classList.remove('hidden');
   setTimeout(()=>$('#workspace').scrollIntoView({behavior:'smooth',block:'start'}),40);
 });
@@ -91,3 +92,58 @@ function converterHtml(units){return `<div class="quick-form"><input id="qValue"
 function bindConverter(map){qRun.onclick=()=>qOutput.textContent=(+qValue.value*map[qFrom.value]/map[qTo.value]).toLocaleString('id-ID',{maximumFractionDigits:8})+' '+qTo.value;qRun.click()}
 function renderQuickTool(key){const t=quickTools[key];if(!t)return;$('#quickIcon').textContent=t.icon;$('#quickTitle').textContent=t.title;$('#quickDescription').textContent=t.desc;$('#quickToolBody').innerHTML=t.html;t.init()}
 $('#year').textContent=new Date().getFullYear();
+
+const fileToolConfigs={
+  'docx-pdf':{icon:'📄',title:'Word ke PDF',desc:'Konversi dokumen DOCX menjadi PDF.',accept:'.docx',multiple:false,hint:'Pilih satu file DOCX · tata letak kompleks mungkin sedikit berubah',note:'Teks, tabel sederhana, dan gambar didukung. Hasil bisa berbeda dari Microsoft Word.'},
+  'pdf-docx':{icon:'📝',title:'PDF ke Word',desc:'Ekstrak teks PDF menjadi dokumen Word.',accept:'.pdf,application/pdf',multiple:false,hint:'Pilih satu file PDF berbasis teks',note:'PDF hasil scan perlu OCR dan belum didukung. Tata letak kompleks akan disederhanakan.'},
+  'image-pdf':{icon:'🖼️',title:'JPG/PNG ke PDF',desc:'Gabungkan gambar menjadi PDF.',accept:'image/jpeg,image/png',multiple:true,hint:'Pilih satu atau beberapa JPG/PNG · urutan mengikuti pilihan'},
+  'pdf-jpg':{icon:'📸',title:'PDF ke JPG',desc:'Ubah halaman PDF menjadi JPG.',accept:'.pdf,application/pdf',multiple:false,hint:'Pilih satu PDF · hasil banyak halaman diunduh sebagai ZIP'},
+  'pptx-pdf':{icon:'📊',title:'PPT ke PDF',desc:'Ekstrak isi presentasi PPTX ke PDF.',accept:'.pptx',multiple:false,hint:'Pilih satu file PPTX',note:'Versi ringan mengekstrak teks per slide. Desain, animasi, dan grafik kompleks tidak ikut.'},
+  'merge-pdf':{icon:'🧩',title:'Gabungkan PDF',desc:'Satukan beberapa PDF menjadi satu.',accept:'.pdf,application/pdf',multiple:true,hint:'Pilih minimal dua PDF · urutan mengikuti pilihan'},
+  'split-pdf':{icon:'✂️',title:'Pisahkan PDF',desc:'Ambil halaman tertentu dari PDF.',accept:'.pdf,application/pdf',multiple:false,hint:'Pilih satu PDF lalu tentukan halaman',range:true}
+};
+let activeFileTool='',selectedDocumentFiles=[];
+function renderFileTool(key){
+  const c=fileToolConfigs[key];if(!c)return;activeFileTool=key;selectedDocumentFiles=[];
+  $('#fileToolIcon').textContent=c.icon;$('#fileToolTitle').textContent=c.title;$('#fileToolDescription').textContent=c.desc;
+  const input=$('#documentInput');input.value='';input.accept=c.accept;input.multiple=c.multiple;
+  $('#fileToolHint').textContent=c.hint;$('#conversionNote').textContent=c.note||'Semua proses berlangsung di perangkat. File tidak diunggah ke server.';
+  $('#selectedFiles').classList.add('hidden');$('#runFileConversion').classList.add('hidden');$('#pageRangeWrap').classList.toggle('hidden',!c.range);
+}
+$('#pickDocument').onclick=()=>$('#documentInput').click();
+$('#documentInput').onchange=e=>{
+  selectedDocumentFiles=[...e.target.files];if(!selectedDocumentFiles.length)return;
+  $('#selectedFiles').innerHTML=selectedDocumentFiles.map((f,i)=>`<div><span>${i+1}. ${escapeHtml(f.name)}</span><b>${formatBytes(f.size)}</b></div>`).join('');
+  $('#selectedFiles').classList.remove('hidden');$('#runFileConversion').classList.remove('hidden');
+};
+function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
+function safeBase(name){return name.replace(/\.[^.]+$/,'').replace(/[^\p{L}\p{N}_-]+/gu,'-')||'hasil'}
+function parsePages(value,total){const out=new Set();value.split(',').forEach(part=>{const [a,b]=part.trim().split('-').map(Number);if(!a)return;for(let i=a;i<=Math.min(b||a,total);i++)if(i>0)out.add(i-1)});return [...out].sort((a,b)=>a-b)}
+async function canvasToJpeg(canvas,quality=.9){return new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',quality))}
+async function pdfTextPages(buffer){
+  const pdf=await pdfjsLib.getDocument({data:buffer}).promise,pages=[];
+  for(let n=1;n<=pdf.numPages;n++){const p=await pdf.getPage(n),content=await p.getTextContent();pages.push(content.items.map(x=>x.str).join(' '))}return pages;
+}
+$('#runFileConversion').onclick=async()=>{
+  const button=$('#runFileConversion');if(!selectedDocumentFiles.length)return toast('Pilih file terlebih dahulu');
+  button.disabled=true;button.textContent='Memproses…';
+  try{
+    if(activeFileTool==='image-pdf'){
+      const pdf=await PDFLib.PDFDocument.create();for(const f of selectedDocumentFiles){const bytes=await f.arrayBuffer(),img=f.type==='image/png'?await pdf.embedPng(bytes):await pdf.embedJpg(bytes);const size=img.scale(1),landscape=size.width>size.height,page=pdf.addPage(landscape?[841.89,595.28]:[595.28,841.89]),pw=page.getWidth()-40,ph=page.getHeight()-40,scale=Math.min(pw/size.width,ph/size.height);page.drawImage(img,{x:(page.getWidth()-size.width*scale)/2,y:(page.getHeight()-size.height*scale)/2,width:size.width*scale,height:size.height*scale})}downloadBlob(new Blob([await pdf.save()],{type:'application/pdf'}),'gambar-gabungan.pdf');
+    }else if(activeFileTool==='merge-pdf'){
+      if(selectedDocumentFiles.length<2)throw new Error('Pilih minimal dua file PDF');const out=await PDFLib.PDFDocument.create();for(const f of selectedDocumentFiles){const src=await PDFLib.PDFDocument.load(await f.arrayBuffer()),pages=await out.copyPages(src,src.getPageIndices());pages.forEach(p=>out.addPage(p))}downloadBlob(new Blob([await out.save()],{type:'application/pdf'}),'pdf-gabungan.pdf');
+    }else if(activeFileTool==='split-pdf'){
+      const src=await PDFLib.PDFDocument.load(await selectedDocumentFiles[0].arrayBuffer()),indices=parsePages($('#pageRange').value,src.getPageCount());if(!indices.length)throw new Error('Isi halaman, misalnya 1-3, 5');const out=await PDFLib.PDFDocument.create(),pages=await out.copyPages(src,indices);pages.forEach(p=>out.addPage(p));downloadBlob(new Blob([await out.save()],{type:'application/pdf'}),'pdf-halaman-terpilih.pdf');
+    }else if(activeFileTool==='pdf-jpg'){
+      const f=selectedDocumentFiles[0],pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,zip=new JSZip();for(let n=1;n<=pdf.numPages;n++){const page=await pdf.getPage(n),viewport=page.getViewport({scale:2}),canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;zip.file(`halaman-${n}.jpg`,await canvasToJpeg(canvas))}downloadBlob(await zip.generateAsync({type:'blob'}),safeBase(f.name)+'-jpg.zip');
+    }else if(activeFileTool==='pdf-docx'){
+      const f=selectedDocumentFiles[0],pages=await pdfTextPages(await f.arrayBuffer()),children=[];pages.forEach((text,i)=>{if(i)children.push(new docx.Paragraph({children:[new docx.PageBreak()]}));children.push(new docx.Paragraph({text,spacing:{line:360}}))});const blob=await docx.Packer.toBlob(new docx.Document({sections:[{children}]}));downloadBlob(blob,safeBase(f.name)+'.docx');
+    }else if(activeFileTool==='docx-pdf'){
+      const f=selectedDocumentFiles[0],result=await mammoth.convertToHtml({arrayBuffer:await f.arrayBuffer()}),box=document.createElement('div');box.className='pdf-render-source';box.innerHTML=result.value;document.body.appendChild(box);const {jsPDF}=window.jspdf,pdf=new jsPDF({unit:'pt',format:'a4'});await pdf.html(box,{margin:[40,40,40,40],autoPaging:'text',width:515,windowWidth:760});box.remove();pdf.save(safeBase(f.name)+'.pdf');
+    }else if(activeFileTool==='pptx-pdf'){
+      const f=selectedDocumentFiles[0],zip=await JSZip.loadAsync(await f.arrayBuffer()),slides=Object.keys(zip.files).filter(x=>/^ppt\/slides\/slide\d+\.xml$/.test(x)).sort((a,b)=>(+a.match(/\d+/)[0])-(+b.match(/\d+/)[0])),{jsPDF}=window.jspdf,pdf=new jsPDF({orientation:'landscape',unit:'pt',format:'a4'});for(let i=0;i<slides.length;i++){if(i)pdf.addPage('a4','landscape');const xml=await zip.file(slides[i]).async('text'),doc=new DOMParser().parseFromString(xml,'text/xml'),texts=[...doc.getElementsByTagName('a:t')].map(n=>n.textContent).filter(Boolean);pdf.setFontSize(15);pdf.text(pdf.splitTextToSize(texts.join('\n\n')||'(Slide tanpa teks)',720),55,65)}pdf.save(safeBase(f.name)+'.pdf');
+    }
+    toast('Konversi selesai');
+  }catch(err){console.error(err);toast(err.message||'Konversi gagal. Periksa format file.')}finally{button.disabled=false;button.textContent='Konversi & unduh'}
+};
+if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';

@@ -1,0 +1,1 @@
+<?php if (!defined('ABSPATH')) exit; get_header(); ?><div class="wrap content-wrap"><div class="content-panel"><h1>Halaman tidak ditemukan</h1><p>Halaman ini mungkin telah dipindahkan.</p><a class="btn" href="<?php echo esc_url(home_url('/')); ?>">Kembali ke Beranda</a></div></div><?php get_footer(); ?>
